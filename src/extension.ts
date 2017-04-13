@@ -1,27 +1,86 @@
 'use strict';
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+import * as vscode from 'vscode';
+import axios from 'axios'
+import * as fileService from './http/httpRequests';
+import socketSetup from './sockets/socketSetup';
+import dmp from 'diff-match-patch';
+
 export function activate(context: vscode.ExtensionContext) {
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "vscode-pair-p" is now active!');
+    /* Command to upload a file to the remote server.
+     * Does not connect - only upload */
+    let uploadFile = vscode.commands.registerCommand('extension.uploadFile', () => {
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.sayHello', () => {
-        // The code you place here will be executed every time your command is executed
+        const fileContents = vscode.window.activeTextEditor.document.getText();
+        const lang = vscode.window.activeTextEditor.document.languageId;
 
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World!');
+        // http request to upload file, then get file uuid
+        fileService.uploadFile(fileContents, lang)
+        .then((res) => {
+            const value = res.data.fileUUID;
+            const message = `Your file has been uploaded! Your file ID is: ${value}`;
+            vscode.window.showInformationMessage(message);
+        });
     });
 
-    context.subscriptions.push(disposable);
+
+    /* Command to upload a file to the remote server AND connect via sockets
+     * AND connect via sockets */
+    let uploadAndConnect = vscode.commands.registerCommand('extension.uploadAndConnect', () => {
+        vscode.commands.executeCommand('extension.uploadFile')
+        .then(() => {
+            var socket = require('socket.io-client')('http://localhost:8000');
+            socketSetup(socket, vscode);
+        });
+    });
+
+    let setJS = vscode.commands.registerCommand('extension.setJS', () => {
+
+    });
+
+
+
+    let downloadFile = vscode.commands.registerCommand('extension.downloadFile', () => {
+        // ask user for the file ID
+        vscode.window.showInputBox({prompt: "Enter the ID of the file you want to connect to"}).then((userInput) => {
+            fileService.downloadFile(userInput)
+            .then((res) => {
+                const message = `you downloaded file with ID: ${res.data}`;
+                vscode.window.showInformationMessage(message);
+            });
+        });
+    });
+
+    // register the socketConnect command
+    let socketConnect = vscode.commands.registerCommand('extension.socketConnect', () => {
+        var socket = require('socket.io-client')('http://localhost:8000');
+        socketSetup(socket, vscode);
+    });
+
+    // get selection command
+    let getSelection = vscode.commands.registerCommand('extension.getSelection', () => {
+        const editor = vscode.window.activeTextEditor;
+        const line = editor.selection.active.line;
+        const char = editor.selection.active.character;
+
+        const str = `cursor at line: ${line} and position: ${char}`;
+        return {
+            line,
+            char
+        };
+    });
+
+    context.subscriptions.push(uploadFile);
+    context.subscriptions.push(downloadFile);
+    context.subscriptions.push(socketConnect);
+    context.subscriptions.push(getSelection);
+}
+
+function diffToText(diff) {
+    const patch = dmp.patch_make(diff);
+    const newText = dmp.patch_toText(patch);
+    return newText;
 }
 
 // this method is called when your extension is deactivated
