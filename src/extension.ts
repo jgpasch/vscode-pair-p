@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import axios from 'axios'
+import { serverSettings } from './config/server';
 import * as fileService from './http/httpRequests';
 import socketSetup from './sockets/socketSetup';
 import dmp from 'diff-match-patch';
@@ -30,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
     let uploadAndConnect = vscode.commands.registerCommand('extension.uploadAndConnect', () => {
         vscode.commands.executeCommand('extension.uploadFile')
         .then(() => {
-            var socket = require('socket.io-client')('http://localhost:8000');
+            var socket = require('socket.io-client')(serverSettings.url);
             socketSetup(socket, vscode);
         });
     });
@@ -43,10 +44,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     let downloadFile = vscode.commands.registerCommand('extension.downloadFile', () => {
         // ask user for the file ID
-        vscode.window.showInputBox({prompt: "Enter the ID of the file you want to connect to"}).then((userInput) => {
+        vscode.window.showInputBox({prompt: "Enter the ID of the file you want to download"}).then((userInput) => {
             fileService.downloadFile(userInput)
             .then((res) => {
-                const message = `you downloaded file with ID: ${res.data}`;
+                const message = `you downloaded file with ID: ${res.data.data}`;
                 vscode.window.showInformationMessage(message);
             });
         });
