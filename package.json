@@ -11,8 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.uploadFile",
-    "onCommand:extension.uploadAndConnect",
+    "onCommand:extension.uploadConnectFile",
     "onCommand:extension.downloadFile",
     "onCommand:extension.socketConnect",
     "onCommand:extension.getSelection"
@@ -21,12 +20,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.uploadFile",
-        "title": "upload file"
-      },
-      {
-        "command": "extension.uploadAndConnect",
-        "title": "upload and connect"
+        "command": "extension.uploadConnectFile",
+        "title": "upload/connect file"
       },
       {
         "command": "extension.downloadFile",

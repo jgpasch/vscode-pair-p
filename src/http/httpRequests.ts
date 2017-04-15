@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { serverSettings } from '../config/server';
 
-export function uploadFile(fileContents, lang) {
-    return axios.post(`${serverSettings.url}files/create`, { fileContents, lang });
+export function uploadFile(file_contents) {
+    return axios.post(`${serverSettings.url}create`, { file_contents });
 }
 
 export function downloadFile(file_uuid) {

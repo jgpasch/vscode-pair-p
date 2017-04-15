@@ -9,30 +9,22 @@ import dmp from 'diff-match-patch';
 
 export function activate(context: vscode.ExtensionContext) {
 
+    console.log('activting');
+
     /* Command to upload a file to the remote server.
      * Does not connect - only upload */
-    let uploadFile = vscode.commands.registerCommand('extension.uploadFile', () => {
+    let uploadFile = vscode.commands.registerCommand('extension.uploadConnectFile', () => {
 
-        const fileContents = vscode.window.activeTextEditor.document.getText();
-        const lang = vscode.window.activeTextEditor.document.languageId;
+        const file_contents = vscode.window.activeTextEditor.document.getText();
 
         // http request to upload file, then get file uuid
-        fileService.uploadFile(fileContents, lang)
+        fileService.uploadFile(file_contents)
         .then((res) => {
-            const value = res.data.fileUUID;
-            const message = `Your file has been uploaded! Your file ID is: ${value}`;
+            const file_uuid = res.data.file_uuid;
+            const message = `Your file has been uploaded! Your file ID is: ${file_uuid}`;
             vscode.window.showInformationMessage(message);
-        });
-    });
-
-
-    /* Command to upload a file to the remote server AND connect via sockets
-     * AND connect via sockets */
-    let uploadAndConnect = vscode.commands.registerCommand('extension.uploadAndConnect', () => {
-        vscode.commands.executeCommand('extension.uploadFile')
-        .then(() => {
             var socket = require('socket.io-client')(serverSettings.url);
-            socketSetup(socket, vscode);
+            socketSetup(socket, vscode, file_uuid);
         });
     });
 
@@ -56,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
     // register the socketConnect command
     let socketConnect = vscode.commands.registerCommand('extension.socketConnect', () => {
         var socket = require('socket.io-client')('http://localhost:8000');
-        socketSetup(socket, vscode);
+        // socketSetup(socket, vscode);
     });
 
     // get selection command

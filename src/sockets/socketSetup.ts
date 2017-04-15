@@ -1,4 +1,7 @@
-export default function(socket, vscode) {
+import editHelpers from '../util/editHelpers';
+
+export default function(socket, vscode, file_uuid) {
+    const edits = editHelpers(vscode);
 
     /*
     """
@@ -6,12 +9,9 @@ export default function(socket, vscode) {
     """
     */
     socket.on('connect', () => {
-        vscode.window.showInputBox({ prompt: "please enter file ID" })
-        .then((userInput) => {
-            vscode.window.showInformationMessage(`Receiving file ${userInput}'s contents`);
-            socket.emit('join', { file_uuid: userInput });
-        });
+        socket.emit('join', { file_uuid });
     });
+
 
     /*
     """
@@ -23,12 +23,14 @@ export default function(socket, vscode) {
         vscode.window.showInformationMessage("Socket connection lost, please reconnect");
     });
 
+
     /*
     """
     FILE_CONTENTS socket event
+    @SOCKET-DATA: file_contents, file_uuid
     """
     */
-    socket.on('fileContents', (data) => {
+    socket.on('file_received', (data) => {
         const coords = {
             start: {
                 line: 0,
@@ -40,57 +42,14 @@ export default function(socket, vscode) {
             }
         };
 
-        // vscode.window.showInformationMessage()
-        vscode.workspace.openTextDocument({ content: data.fileContents, language: 'javascript' })
-        .then((document) => {
-            // const text = document.getText();
-            // vscode.window.showInformationMessage(text);
-            vscode.window.showTextDocument(document);
-        });
+        // UNCOMMENT these lines to open in new text document.
+        // vscode.workspace.openTextDocument({ content: data.file_contents, language: 'typescript' })
+        // .then((document) => {
+        //     vscode.window.showTextDocument(document);
+        // });
 
-        // applyEdit(vscode.window.activeTextEditor, coords, data.fileContents);
+        edits.applyEdit(vscode.window.activeTextEditor, coords, data.file_contents);
+
     });
-
-    function applyEdit (vsEditor, coords, content){
-        var vsDocument = getDocument(vsEditor);
-        var edit = setEditFactory(vsDocument._uri, coords, content);
-        vscode.workspace.applyEdit(edit);
-    }
-
-    function getDocument (vsEditor) {
-        return typeof vsEditor._documentData !== 'undefined' ? vsEditor._documentData : vsEditor._document
-    }
-
-    function positionFactory(line, char) {
-        return new vscode.Position(line, char);
-    }
-
-    function rangeFactory(start, end) {
-        return new vscode.Range(start, end);
-    }
-
-    function textEditFactory(range, content) {
-        return new vscode.TextEdit(range, content);
-    }
-
-    function editFactory (coords, content){
-        var start = positionFactory(coords.start.line, coords.start.char);
-        var end = positionFactory(coords.end.line, coords.end.char);
-        var range = rangeFactory(start, end);
-
-        return textEditFactory(range, content);
-    }
-
-    function setEditFactory(uri, coords, content) {
-        var workspaceEdit = workspaceEditFactory();
-        var edit = editFactory(coords, content);
-
-        workspaceEdit.set(uri, [edit]);
-        return workspaceEdit;
-    }
-
-    function workspaceEditFactory() {
-        return new vscode.WorkspaceEdit();
-    }
 }
 
