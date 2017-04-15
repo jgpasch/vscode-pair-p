@@ -1,65 +1,18 @@
-# vscode-pair-p README
+This is a work in progress!!!!
 
-This is the README for your extension "vscode-pair-p". After writing up a brief description, we recommend including the following sections.
+This extension is part of a larger family of repos that lets users do remote pair programming using their IDE of choce.
 
-## Features
+This repo is for the VSCode extension.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+In order to use this extension, you must point to the running collab server.
+You can change the server url in the file src/config/server.ts by changing the value of 'url'.
 
-For example if there is an image subfolder under your extension project workspace:
+When the server is running (work in progress), you can simply open this folder in VSCode, and press F5 to run the extension in debug mode.
 
-\!\[feature X\]\(images/feature-x.png\)
+At this point, press SHIFT + CMD + P to open the command palette, and type the command 'upload/connect file'.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+This will send whatever file contents you have in the active editor window to the server, and return you a unique file UUID.
 
-## Requirements
+You can give this unique ID to your remote collaborator, and they can use the ID to connect to the file as well.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+From then, you will see live edits that anyone else connected to the file makes! (this functionality to come.)
