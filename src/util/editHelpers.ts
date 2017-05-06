@@ -31,7 +31,9 @@ export default function(vscode) {
 
     this.setEditFactory = (uri, coords, content) => {
         var edit = this.editFactory(coords, content);
-        return new vscode.WorkspaceEdit(uri, [edit]);
+        const wse = new vscode.WorkspaceEdit();
+        wse.set(uri, [edit]);
+        return wse;
     }
 
     return this;

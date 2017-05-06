@@ -13,7 +13,7 @@
   "activationEvents": [
     "onCommand:extension.uploadConnectFile",
     "onCommand:extension.downloadFile",
-    "onCommand:extension.socketConnect",
+    "onCommand:extension.connect",
     "onCommand:extension.getSelection"
   ],
   "main": "./out/src/extension",
@@ -24,12 +24,8 @@
         "title": "upload/connect file"
       },
       {
-        "command": "extension.downloadFile",
-        "title": "download file"
-      },
-      {
-        "command": "extension.socketConnect",
-        "title": "socket connect"
+        "command": "extension.connect",
+        "title": "connect"
       },
       {
         "command": "extension.getSelection",

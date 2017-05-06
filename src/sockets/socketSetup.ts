@@ -2,6 +2,7 @@ import editHelpers from '../util/editHelpers';
 
 export default function(socket, vscode, file_uuid) {
     const edits = editHelpers(vscode);
+    console.log('inside soket setup');
 
     /*
     """
@@ -9,6 +10,7 @@ export default function(socket, vscode, file_uuid) {
     """
     */
     socket.on('connect', () => {
+        console.log('connection');
         socket.emit('join', { file_uuid });
     });
 
@@ -19,6 +21,7 @@ export default function(socket, vscode, file_uuid) {
     """
     */
     socket.on('disconnect', () => {
+        socket.emit('leave', { file_uuid });
         socket.destroy();
         vscode.window.showInformationMessage("Socket connection lost, please reconnect");
     });
@@ -26,8 +29,8 @@ export default function(socket, vscode, file_uuid) {
 
     /*
     """
-    FILE_CONTENTS socket event
-    @SOCKET-DATA: file_contents, file_uuid
+    FILE_RECEIVED socket event
+    @SOCKET - DATA: file_contents, file_uuid
     """
     */
     socket.on('file_received', (data) => {
