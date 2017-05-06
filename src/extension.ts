@@ -5,9 +5,23 @@ import axios from 'axios'
 import { serverSettings } from './config/server';
 import * as fileService from './http/httpRequests';
 import socketSetup from './sockets/socketSetup';
-import dmp from 'diff-match-patch';
+const DiffMatchPatch = require('diff-match-patch');
 
 export function activate(context: vscode.ExtensionContext) {
+
+    let oldText = '';
+    // let socketio;
+    const dmp = new DiffMatchPatch();
+
+    function setupDiffWatch() {
+        vscode.workspace.onDidChangeTextDocument((event) => {
+            const newText = event.document.getText();
+            const diff = diffFromText(dmp, oldText, newText);
+            // TODO
+            // socket emit diff
+            oldText = newText;
+        })
+    }
 
     console.log('activting');
 
@@ -16,6 +30,8 @@ export function activate(context: vscode.ExtensionContext) {
     let uploadFile = vscode.commands.registerCommand('extension.uploadConnectFile', () => {
 
         const file_contents = vscode.window.activeTextEditor.document.getText();
+        console.log(file_contents);
+        oldText = file_contents;
 
         // http request to upload file, then get file uuid
         fileService.uploadFile(file_contents)
@@ -70,10 +86,17 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(getSelection);
 }
 
-function diffToText(diff) {
+function diffToText(dmp, diff) {
     const patch = dmp.patch_make(diff);
     const newText = dmp.patch_toText(patch);
     return newText;
+}
+
+function diffFromText(dmp, oldText, newText) {
+    console.log('running diff from text');
+    const diffs = dmp.diff_main(oldText, newText);
+    console.log(diffs);
+    return diffs;
 }
 
 // this method is called when your extension is deactivated
